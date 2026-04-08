@@ -1,0 +1,8 @@
+Vanilla HTML5
+CSS3 (custom, no framework)
+JavaScript ES6+ (vanilla, no libraries)
+Google Fonts: Playfair Display + Inter
+Canvas API — confetti particles + video thumbnail generation
+IntersectionObserver API — scroll reveal
+No build tools, no bundler
+Hosting: GitHub Pages (static)

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday! 🎂</title>
+  <meta name="description" content="A special birthday greeting from your celebrity squad." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow reveal-up">🎂 A Special Delivery For You 🎂</p>
+      <h1 class="hero-title">
+        <span class="title-line reveal-up delay-1">Happy Happy</span>
+        <span class="title-line gold reveal-up delay-2">Birthday</span>
+        <span class="title-line reveal-up delay-3">To You!</span>
+      </h1>
+      <p class="hero-msg reveal-up delay-4">Your celebrity squad showed up just for this moment.</p>
+      <a class="scroll-cta reveal-up delay-5" href="#intro">
+        <span>See your greetings</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== INTRO VIDEO ===== -->
+  <section class="intro-section" id="intro">
+    <div class="container">
+      <h2 class="section-title reveal-up">First Things First...</h2>
+      <p class="section-sub reveal-up delay-1">A very special message to kick things off.</p>
+      <div class="featured-video reveal-up delay-2" id="featured-video">
+        <video id="intro-video" src="assets/bdayintro.mp4" playsinline preload="metadata"></video>
+        <div class="fv-overlay" id="fv-overlay">
+          <button class="play-btn" id="intro-play-btn" aria-label="Play intro video">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SQUAD GRID ===== -->
+  <section class="squad-section" id="squad">
+    <div class="container">
+      <h2 class="section-title reveal-up">Your Greeting Squad</h2>
+      <p class="section-sub reveal-up delay-1">They all showed up. Just for you.</p>
+      <div class="squad-grid" id="squad-grid"></div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-emojis" aria-hidden="true">🎉 🎂 🎈</p>
+      <h3 class="footer-title">Hope your day is as amazing as you are!</h3>
+      <p class="footer-sub">Wishing you all the joy, laughter, and cake you deserve.</p>
+      <p class="footer-credit">Made with ❤️</p>
+    </div>
+  </footer>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-label">
+    <div class="modal-bd" id="modal-bd"></div>
+    <div class="modal-box">
+      <button class="modal-close" id="modal-close" aria-label="Close video">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <p class="modal-label" id="modal-label"></p>
+      <video id="modal-video" playsinline controls></video>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

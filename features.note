@@ -1,0 +1,24 @@
+Birthday greeting website — reusable (no hardcoded name)
+
+SECTIONS
+- Hero: fullscreen animated "Happy Happy Birthday To You!" + canvas confetti
+- Intro Video: featured player for bdayintro.mp4 with cinematic play button
+- Celebrity Greeting Squad: 6 cards grid
+- Footer: celebratory message
+
+CELEBRITY SQUAD
+- Dwayne "The Rock" Johnson  (dwaynebday.mp4)
+- Donald Trump               (trumpbday.mp4)
+- The Minions                (minionbday.mp4)
+- Africa                     (africabday.mp4)
+- Jack Black & Jason Momoa   (jbjmbday.mp4)
+- Johnny Sins                (sinsbday.mp4)
+
+INTERACTIONS
+- Canvas confetti particles (gold, pink, purple, white)
+- Auto-generated video thumbnails via canvas API
+- Video modal theater (card click → plays video in overlay)
+- Staggered scroll reveal via IntersectionObserver
+- Intro video play/pause with overlay state
+- Keyboard: Esc closes modal, Enter/Space activates cards
+- Responsive grid: 3-col → 2-col (≤900px) → 1-col (≤540px)
