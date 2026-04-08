@@ -80,7 +80,23 @@
       if (particles.length < 35) particles.push(spawnParticle());
     }, 350);
   }, 10000);
+
+  // Expose burst for card reveals
+  window.triggerConfettiBurst = function (x, y, count) {
+    for (let k = 0; k < (count || 40); k++) {
+      const p = spawnParticle();
+      p.x = x + (Math.random() - 0.5) * 80;
+      p.y = y + (Math.random() - 0.5) * 40;
+      p.vy = -(Math.random() * 4 + 2); // burst upward
+      p.vx = (Math.random() - 0.5) * 5;
+      p.alpha = 1;
+      particles.push(p);
+    }
+  };
 })();
+
+/* ===== MYSTERY REVEAL STATE ===== */
+let revealedCount = 0;
 
 /* ===== SQUAD DATA ===== */
 const SQUAD = [
@@ -163,11 +179,12 @@ function buildCards() {
 
   SQUAD.forEach((member, i) => {
     const card = document.createElement('div');
-    card.className = 'squad-card reveal-up';
+    // Start all cards as mystery — click listeners added after reveal
+    card.className = 'squad-card reveal-up mystery';
     card.style.transitionDelay = `${i * 0.09}s`;
     card.setAttribute('role', 'button');
-    card.setAttribute('tabindex', '0');
-    card.setAttribute('aria-label', `Watch ${member.name}'s birthday greeting`);
+    card.setAttribute('tabindex', '-1'); // not focusable until revealed
+    card.setAttribute('aria-label', `Mystery Guest ${i + 1} — not yet revealed`);
 
     card.innerHTML = `
       <div class="card-thumb">
@@ -184,28 +201,87 @@ function buildCards() {
       </div>
     `;
 
-    const open = () => openModal(member);
-    card.addEventListener('click', open);
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        open();
-      }
-    });
+    // Mystery cover overlay (sits above card content via z-index)
+    const cover = document.createElement('div');
+    cover.className = 'mystery-cover';
+    cover.innerHTML = `
+      <div class="mystery-icon">?</div>
+      <p class="mystery-label">Mystery Guest #${i + 1}</p>
+    `;
+    card.appendChild(cover);
 
     grid.appendChild(card);
 
-    // Try to generate thumbnail — falls back to gradient silently
+    // Generate thumbnail in background — will be visible after reveal
     generateThumbnail(member.file, (dataUrl) => {
       const thumb = card.querySelector('.card-thumb');
       const img = document.createElement('img');
       img.src = dataUrl;
       img.alt = '';
       img.setAttribute('aria-hidden', 'true');
-      // Insert before play hover so it sits under it
       thumb.insertBefore(img, thumb.querySelector('.card-play-hover'));
     });
   });
+}
+
+/* ===== MYSTERY REVEAL ===== */
+function updateRevealUI() {
+  const btn = document.getElementById('reveal-btn');
+  const counter = document.getElementById('reveal-counter');
+  if (revealedCount >= SQUAD.length) {
+    btn.textContent = 'All Guests Revealed! 🎉';
+    btn.disabled = true;
+    counter.textContent = 'The whole squad showed up!';
+  } else {
+    btn.textContent = 'Reveal Next Guest 🎁';
+    counter.textContent = `${revealedCount} of ${SQUAD.length} revealed`;
+  }
+}
+
+function revealNextCard() {
+  if (revealedCount >= SQUAD.length) return;
+
+  const btn = document.getElementById('reveal-btn');
+  btn.disabled = true; // guard against double-click during animation
+
+  const cards = document.querySelectorAll('.squad-card');
+  const card = cards[revealedCount];
+  const member = SQUAD[revealedCount];
+
+  // Capture position before any DOM changes
+  const rect = card.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  // Make card interactive
+  card.classList.remove('mystery');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-label', `Watch ${member.name}'s birthday greeting`);
+
+  const open = () => openModal(member);
+  card.addEventListener('click', open);
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      open();
+    }
+  });
+
+  revealedCount++;
+
+  // Animate mystery cover away
+  const cover = card.querySelector('.mystery-cover');
+  cover.classList.add('is-revealing');
+
+  setTimeout(() => {
+    cover.remove();
+    window.triggerConfettiBurst(cx, cy, 50);
+    updateRevealUI();
+    // Re-enable button if more cards remain
+    if (revealedCount < SQUAD.length) {
+      btn.disabled = false;
+    }
+  }, 650);
 }
 
 /* ===== MODAL ===== */
@@ -242,11 +318,27 @@ document.addEventListener('keydown', (e) => {
 /* ===== INTRO VIDEO ===== */
 const introVideo = document.getElementById('intro-video');
 const introPlayBtn = document.getElementById('intro-play-btn');
+const introPauseBtn = document.getElementById('intro-pause-btn');
 const featuredEl = document.getElementById('featured-video');
 
 introPlayBtn.addEventListener('click', () => {
   featuredEl.classList.add('playing');
   introVideo.play().catch(() => {});
+});
+
+introPauseBtn.addEventListener('click', () => {
+  introVideo.pause();
+});
+
+// Click anywhere on the video wrapper to toggle play/pause
+featuredEl.addEventListener('click', (e) => {
+  if (e.target.closest('button')) return; // let buttons handle themselves
+  if (introVideo.paused) {
+    featuredEl.classList.add('playing');
+    introVideo.play().catch(() => {});
+  } else {
+    introVideo.pause();
+  }
 });
 
 introVideo.addEventListener('ended', () => featuredEl.classList.remove('playing'));
@@ -283,4 +375,6 @@ document.addEventListener('DOMContentLoaded', () => {
   heroEntrance();
   buildCards();
   setupReveal();
+  document.getElementById('reveal-btn').addEventListener('click', revealNextCard);
+  updateRevealUI();
 });

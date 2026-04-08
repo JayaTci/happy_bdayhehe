@@ -277,6 +277,22 @@ a {
   pointer-events: none;
 }
 
+/* Reveal pause icon on hover while playing */
+.featured-video.playing:hover .fv-overlay {
+  opacity: 1;
+  pointer-events: auto;
+  background: rgba(8, 5, 16, 0.2);
+}
+
+.featured-video.playing .play-btn {
+  display: none;
+}
+
+.featured-video.playing:hover .pause-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .play-btn {
   width: 78px;
   height: 78px;
@@ -308,6 +324,32 @@ a {
   50%       { box-shadow: 0 0 0 20px rgba(212, 175, 55, 0); }
 }
 
+.pause-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(8, 5, 16, 0.7);
+  border: 2px solid rgba(212, 175, 55, 0.65);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, background 0.2s, transform 0.2s;
+}
+
+.pause-btn:hover {
+  background: rgba(8, 5, 16, 0.9);
+  transform: scale(1.08);
+}
+
+.pause-btn svg {
+  width: 26px;
+  height: 26px;
+  fill: var(--gold);
+}
+
 /* ===== SQUAD GRID ===== */
 .squad-grid {
   display: grid;
@@ -317,6 +359,7 @@ a {
 
 /* ===== SQUAD CARD ===== */
 .squad-card {
+  position: relative;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -324,6 +367,129 @@ a {
   cursor: pointer;
   transition: transform 0.38s var(--ease), border-color 0.3s, box-shadow 0.38s;
   outline-offset: 3px;
+}
+
+/* Unrevealed mystery state */
+.squad-card.mystery {
+  cursor: default;
+  pointer-events: none;
+}
+
+.squad-card.mystery:hover {
+  transform: none;
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+/* Mystery overlay */
+.mystery-cover {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #0d0820 0%, #1a0d36 60%, #0f0b1f 100%);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  z-index: 10;
+  cursor: default;
+  transition: transform 0.6s var(--ease), opacity 0.5s ease;
+  transform-origin: center center;
+}
+
+.mystery-cover.is-revealing {
+  transform: scale(0);
+  opacity: 0;
+}
+
+.mystery-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 2px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--gold);
+  animation: mystery-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes mystery-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(212, 175, 55, 0);
+    transform: scale(1.07);
+  }
+}
+
+.mystery-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+/* Reveal button row */
+.reveal-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2.75rem;
+}
+
+.reveal-btn {
+  padding: 0.9rem 2.4rem;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+  border: none;
+  color: var(--bg);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s;
+  animation: btn-glow 3s ease-in-out infinite;
+}
+
+.reveal-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 30px rgba(212, 175, 55, 0.35);
+}
+
+.reveal-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.reveal-btn:disabled {
+  background: linear-gradient(135deg, var(--gold-dark) 0%, #4a3800 100%);
+  cursor: default;
+  animation: none;
+  transform: none;
+  opacity: 0.65;
+}
+
+@keyframes btn-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+  50%       { box-shadow: 0 0 0 18px rgba(212, 175, 55, 0); }
+}
+
+.reveal-counter {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
 }
 
 .squad-card:focus-visible {
