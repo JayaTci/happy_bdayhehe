@@ -179,12 +179,12 @@ function buildCards() {
 
   SQUAD.forEach((member, i) => {
     const card = document.createElement('div');
-    // Start all cards as mystery — click listeners added after reveal
     card.className = 'squad-card reveal-up mystery';
     card.style.transitionDelay = `${i * 0.09}s`;
     card.setAttribute('role', 'button');
-    card.setAttribute('tabindex', '-1'); // not focusable until revealed
-    card.setAttribute('aria-label', `Mystery Guest ${i + 1} — not yet revealed`);
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `Mystery Guest ${i + 1} — tap to reveal`);
+    card.dataset.index = i;
 
     card.innerHTML = `
       <div class="card-thumb">
@@ -201,18 +201,32 @@ function buildCards() {
       </div>
     `;
 
-    // Mystery cover overlay (sits above card content via z-index)
+    // Mystery cover overlay
     const cover = document.createElement('div');
     cover.className = 'mystery-cover';
     cover.innerHTML = `
       <div class="mystery-icon">?</div>
       <p class="mystery-label">Mystery Guest #${i + 1}</p>
+      <p class="tap-hint" aria-hidden="true"></p>
     `;
     card.appendChild(cover);
 
+    // Tap handler — only reveals if this is the next card in sequence
+    card.addEventListener('click', () => {
+      const idx = parseInt(card.dataset.index, 10);
+      if (idx === revealedCount) revealCard(card, member, idx);
+    });
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const idx = parseInt(card.dataset.index, 10);
+        if (idx === revealedCount) revealCard(card, member, idx);
+      }
+    });
+
     grid.appendChild(card);
 
-    // Generate thumbnail in background — will be visible after reveal
+    // Generate thumbnail in background — visible after reveal
     generateThumbnail(member.file, (dataUrl) => {
       const thumb = card.querySelector('.card-thumb');
       const img = document.createElement('img');
@@ -225,62 +239,56 @@ function buildCards() {
 }
 
 /* ===== MYSTERY REVEAL ===== */
-function updateRevealUI() {
-  const btn = document.getElementById('reveal-btn');
-  const counter = document.getElementById('reveal-counter');
-  if (revealedCount >= SQUAD.length) {
-    btn.textContent = 'All Guests Revealed! 🎉';
-    btn.disabled = true;
-    counter.textContent = 'The whole squad showed up!';
-  } else {
-    btn.textContent = 'Reveal Next Guest 🎁';
-    counter.textContent = `${revealedCount} of ${SQUAD.length} revealed`;
-  }
+
+// Marks the current next-to-reveal card with a visual hint
+function markNextCard() {
+  const covers = document.querySelectorAll('.mystery-cover');
+  covers.forEach((c, i) => {
+    const hint = c.querySelector('.tap-hint');
+    if (i === revealedCount) {
+      c.classList.add('is-next');
+      if (hint) hint.textContent = 'Tap to reveal ✨';
+    } else {
+      c.classList.remove('is-next');
+      if (hint) hint.textContent = '';
+    }
+  });
 }
 
-function revealNextCard() {
-  if (revealedCount >= SQUAD.length) return;
+// Animates guard + reveal for a single card
+let isRevealing = false;
 
-  const btn = document.getElementById('reveal-btn');
-  btn.disabled = true; // guard against double-click during animation
+function revealCard(card, member, index) {
+  if (isRevealing || index !== revealedCount) return;
+  isRevealing = true;
 
-  const cards = document.querySelectorAll('.squad-card');
-  const card = cards[revealedCount];
-  const member = SQUAD[revealedCount];
-
-  // Capture position before any DOM changes
   const rect = card.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
 
-  // Make card interactive
-  card.classList.remove('mystery');
-  card.setAttribute('tabindex', '0');
-  card.setAttribute('aria-label', `Watch ${member.name}'s birthday greeting`);
-
-  const open = () => openModal(member);
-  card.addEventListener('click', open);
-  card.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      open();
-    }
-  });
-
   revealedCount++;
 
-  // Animate mystery cover away
+  // Animate cover away
   const cover = card.querySelector('.mystery-cover');
   cover.classList.add('is-revealing');
 
   setTimeout(() => {
     cover.remove();
+
+    // Make card fully interactive for video playback
+    card.classList.remove('mystery');
+    card.setAttribute('aria-label', `Watch ${member.name}'s birthday greeting`);
+
+    // Replace tap-to-reveal handler with open-modal handler
+    const open = () => openModal(member);
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+
     window.triggerConfettiBurst(cx, cy, 50);
-    updateRevealUI();
-    // Re-enable button if more cards remain
-    if (revealedCount < SQUAD.length) {
-      btn.disabled = false;
-    }
+    markNextCard();
+    isRevealing = false;
   }, 650);
 }
 
@@ -375,6 +383,5 @@ document.addEventListener('DOMContentLoaded', () => {
   heroEntrance();
   buildCards();
   setupReveal();
-  document.getElementById('reveal-btn').addEventListener('click', revealNextCard);
-  updateRevealUI();
+  markNextCard(); // highlight card #1 as the first to tap
 });

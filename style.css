@@ -369,10 +369,9 @@ a {
   outline-offset: 3px;
 }
 
-/* Unrevealed mystery state */
+/* Unrevealed mystery state — tappable but no hover lift */
 .squad-card.mystery {
-  cursor: default;
-  pointer-events: none;
+  cursor: pointer;
 }
 
 .squad-card.mystery:hover {
@@ -438,59 +437,32 @@ a {
   color: var(--muted);
 }
 
-/* Reveal button row */
-.reveal-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 2.75rem;
+/* Next-card-to-reveal highlight */
+.mystery-cover.is-next {
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  box-shadow: inset 0 0 30px rgba(212, 175, 55, 0.06), 0 0 20px rgba(212, 175, 55, 0.1);
 }
 
-.reveal-btn {
-  padding: 0.9rem 2.4rem;
-  border-radius: 50px;
-  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-  border: none;
-  color: var(--bg);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  transition: transform 0.2s var(--ease), box-shadow 0.2s;
-  animation: btn-glow 3s ease-in-out infinite;
+.mystery-cover.is-next .mystery-icon {
+  border-color: var(--gold-light);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
 }
 
-.reveal-btn:hover {
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 8px 30px rgba(212, 175, 55, 0.35);
-}
-
-.reveal-btn:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.reveal-btn:disabled {
-  background: linear-gradient(135deg, var(--gold-dark) 0%, #4a3800 100%);
-  cursor: default;
-  animation: none;
-  transform: none;
-  opacity: 0.65;
-}
-
-@keyframes btn-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
-  50%       { box-shadow: 0 0 0 18px rgba(212, 175, 55, 0); }
-}
-
-.reveal-counter {
-  font-size: 0.75rem;
+.tap-hint {
+  font-size: 0.68rem;
   font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--muted);
+  color: var(--gold);
+  opacity: 0.8;
+  animation: hint-fade 1.8s ease-in-out infinite;
 }
+
+@keyframes hint-fade {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
 
 .squad-card:focus-visible {
   outline: 2px solid var(--gold);
