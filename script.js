@@ -107,7 +107,7 @@ const SQUAD = [
   },
   {
     name: 'Africa',
-    tag: 'A Very Special Guest',
+    tag: 'From Africa with Love <3',
     emoji: '🌍',
     file: 'assets/africabday.mp4',
     gradient: 'linear-gradient(135deg, #0f2210, #1a3820)',
